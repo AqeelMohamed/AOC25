@@ -75,28 +75,66 @@ impl Lock
 }
 
 impl AddAssign<TurnSequence> for Lock {
-    fn add_assign(&mut self, rhs: TurnSequence) {
-        let old = self.value;
-        let step = rhs.value % 100;
+    fn add_assign(&mut self, mut rhs: TurnSequence) {
+        println!("Starting AddAssign");
+        println!("\tLock Value: {}, TurnSequence: {:?}", self.value, rhs);
+        while rhs.value > 100
+        {
+            // Increase the number of times it passes 0 and decrease the TurnSequence
+            self.num_wraps += 1;
+            rhs.value -= 100;
+            println!("\t\tTurnSequence Decrement: {}, Num Wraps: {}", rhs.value, self.num_wraps);
+        }
 
-        // TODO: Fix the looping logic in this function
         match rhs.direction {
             'L' => {
-                self.num_wraps += (step - old) / 100;
+                // Slowly decrement the rhs by 99 while it is over 99
 
-                let mut new = (old - step) % 100;
-                if new < 0
+                // L200 -> L111 -> L2
+
+                // Here, the rhs.value should be < 99, so we should be able to subtract it directly
+                // V=1, L2
+                if self.value - rhs.value < 0 && self.value != 0
                 {
-                    new += 100;
+                    println!("\t\tLeft TurnSequence Under 0");
+                    rhs.value -= self.value;
+                    self.value = 100 - rhs.value;
+                    self.num_wraps += 1;
+                    println!("\t\tLock Value: {}, TurnSequence: {:?}, Num Wraps: {}", self.value, rhs, self.num_wraps);
                 }
+                else
+                {
+                    println!("\t\tLeft Turn Sequence over 0");
+                    if self.value == 0
+                    {
+                        self.value = 100 - rhs.value;
+                    }
+                    else
+                    {
+                        self.value -= rhs.value;
+                    }
 
-                self.value = new;
+                    println!("\t\tLock Value: {}, TurnSequence: {:?}", self.value, rhs);
+                }
             }
 
             'R' => {
-                self.num_wraps += (old + step) / 100;
-
-                self.value = (old + step) % 100;
+                // Here, the rhs.value should be < 99, so we should be able to subtract it directly
+                // V=59, R=51
+                if self.value + rhs.value > 100
+                {
+                    println!("\t\tRight TurnSequence Over 99");
+                    rhs.value += self.value;
+                    self.value = rhs.value - 100;
+                    self.num_wraps += 1;
+                    println!("\t\tLock Value: {}, TurnSequence: {:?}, Num Wraps: {}", self.value, rhs, self.num_wraps);
+                }
+                else
+                {
+                    println!("\t\tRight Turn Sequence under 99");
+                    self.value += rhs.value;
+                    println!("\t\tLock Value: {}, TurnSequence: {:?}", self.value, rhs);
+                }
             }
 
             _ => {}
@@ -105,7 +143,7 @@ impl AddAssign<TurnSequence> for Lock {
 }
 
 fn main() {
-    // Check to see if file path exists to the input document
+    // Check to see if file path exists to the input2 document
     let file_path = Path::new("input");
 
     if file_path.exists() {
@@ -119,7 +157,6 @@ fn main() {
         let mut num_zeros: i32 = 0;
 
         // Loop through the string, converting every line to a turn sequence
-
         for s in contents.split('\n')
         {
             let turn = s.parse::<TurnSequence>();
@@ -128,6 +165,7 @@ fn main() {
             {
                 lock += t;
 
+                // Step 1
                 if lock.value == 0
                 {
                     num_zeros += 1;
