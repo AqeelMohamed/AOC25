@@ -15,7 +15,7 @@ class Bank
     set_bank_voltage
   end
 
-  def set_bank_voltage
+  def set_bank_voltage_step_one
     # Loop through the bank and determine the highest voltage from the bank
     @bank_values.each_with_index do |b,i|
       @bank_values[(i+1)..].each do |c|
@@ -24,6 +24,38 @@ class Bank
         @max_voltage = voltage if voltage > @max_voltage
       end
     end
+  end
+
+  def set_bank_voltage
+    # initialize variables for the algorithm
+    leeway = 3 # how many digits we can remove
+    index = 0
+    digits = Array.new
+
+    p @bank_values[index, index+leeway]
+
+    # while leeway != 0
+    #   # While we have some leeway, choose the largest in a group of 4 digits
+    #   if index + leeway >= @bank_values.size
+    #     @bank_values[index].each_char do |c|
+    #       digits.push(c)
+    #     end
+    #     break
+    #   end
+    #
+    #   max_index_four = @bank_values[index..index+3].each_with_index.max[1]
+    #   if max_index_four != index
+    #     leeway -= max_index_four
+    #     index = max_index_four
+    #     digits.push(@bank_values[index])
+    #   else
+    #     digits.push(@bank_values[index])
+    #     index += 1
+    #   end
+    # end
+
+    # puts digits
+    @max_voltage = 0
   end
 
   def to_s
@@ -63,7 +95,7 @@ def work_with_file(testing=false)
   file_path = if !testing
     "input"
   else
-    "input2"
+    "input3"
   end
 
   # Open the file and print contents to terminal
@@ -89,4 +121,4 @@ def work_with_file(testing=false)
   end
 end
 
-work_with_file(false)
+work_with_file(true)
