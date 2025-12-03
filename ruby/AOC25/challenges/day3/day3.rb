@@ -7,9 +7,7 @@ class Bank
     # Parse the battery string and turn it into a list of integers
     battery_str.each_char do |c|
       # Add the parsed value of the character into the list
-      if c != "\n"
-        @bank_values.push(c)
-      end
+      @bank_values.push(c) if c != "\n"
     end
 
     # Initialize the max voltage and set it
@@ -23,9 +21,7 @@ class Bank
       @bank_values[(i+1)..].each do |c|
         # Combine the two values and convert into an integer
         voltage = (b + c).to_i
-        if voltage > @max_voltage
-          @max_voltage = voltage
-        end
+        @max_voltage = voltage if voltage > @max_voltage
       end
     end
   end
@@ -35,9 +31,7 @@ class Bank
   end
 
   # Getters
-  def max_voltage
-    @max_voltage
-  end
+  attr_reader :max_voltage
 
 end
 
@@ -53,8 +47,8 @@ class Battery
   def get_total_voltage
     total_voltage = 0
     @banks.each do |b|
-      puts b.max_voltage
-      total_voltage = total_voltage + b.max_voltage
+	    # puts b.max_voltage
+      total_voltage += b.max_voltage
     end
 
     total_voltage
@@ -66,10 +60,10 @@ end
 # Create functions
 def work_with_file(testing=false)
   # Create variable for file_path depending on if we are doing test_input or not
-  if not testing
-    file_path = "input"
+  file_path = if !testing
+    "input"
   else
-    file_path = "input2"
+    "input2"
   end
 
   # Open the file and print contents to terminal
@@ -81,9 +75,7 @@ def work_with_file(testing=false)
     # Open the file within a foreach to get contents of it
     File.foreach(file_path) do |line|
       # Make sure we are not working with an empty line
-      if line.strip.empty?
-        next
-      end
+      next if line.strip.empty?
 
       # Create a bank
       bank = Bank.new(line)
