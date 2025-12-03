@@ -94,26 +94,21 @@ impl AddAssign<TurnSequence> for Lock {
 
                 // Here, the rhs.value should be < 99, so we should be able to subtract it directly
                 // V=1, L2
-                if self.value - rhs.value < 0 && self.value != 0
+                if self.value - rhs.value < 0
                 {
                     println!("\t\tLeft TurnSequence Under 0");
                     rhs.value -= self.value;
                     self.value = 100 - rhs.value;
-                    self.num_wraps += 1;
+                    if self.value != 0
+                    {
+                        self.num_wraps += 1;
+                    }
                     println!("\t\tLock Value: {}, TurnSequence: {:?}, Num Wraps: {}", self.value, rhs, self.num_wraps);
                 }
                 else
                 {
                     println!("\t\tLeft Turn Sequence over 0");
-                    if self.value == 0
-                    {
-                        self.value = 100 - rhs.value;
-                    }
-                    else
-                    {
-                        self.value -= rhs.value;
-                    }
-
+                    self.value -= rhs.value;
                     println!("\t\tLock Value: {}, TurnSequence: {:?}", self.value, rhs);
                 }
             }
@@ -126,7 +121,10 @@ impl AddAssign<TurnSequence> for Lock {
                     println!("\t\tRight TurnSequence Over 99");
                     rhs.value += self.value;
                     self.value = rhs.value - 100;
-                    self.num_wraps += 1;
+                    if self.value != 0
+                    {
+                        self.num_wraps += 1;
+                    }
                     println!("\t\tLock Value: {}, TurnSequence: {:?}, Num Wraps: {}", self.value, rhs, self.num_wraps);
                 }
                 else
