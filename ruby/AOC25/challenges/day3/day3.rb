@@ -45,7 +45,7 @@ class Bank
     #
     #   max_index_four = @bank_values[index..index+3].each_with_index.max[1]
     #   if max_index_four != index
-    #     leeway -= max_index_four
+    #     leeway -= (max_index_four - index)
     #     index = max_index_four
     #     digits.push(@bank_values[index])
     #   else
